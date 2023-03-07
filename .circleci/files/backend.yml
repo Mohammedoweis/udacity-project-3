@@ -10,7 +10,7 @@ Resources:
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: !Sub UdaPeople-${CIRCLE_WORKFLOW_ID:0:7}
+      GroupName: !Sub UdaPeople-${ID}
       GroupDescription: Allow port 22 and port 3030.
       SecurityGroupIngress:
         - IpProtocol: tcp
@@ -32,5 +32,4 @@ Resources:
       ImageId: ami-09cd747c78a9add63
       Tags:
         - Key: Name
-          Value: !Sub backend-${CIRCLE_WORKFLOW_ID:0:7}
- 
+          Value: !Sub backend-${ID}  
