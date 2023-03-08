@@ -192,17 +192,23 @@ jobs:
       
       steps:
       - checkout
-      - install_ansible
       - add_ssh_keys:
           fingerprints: ["9b:1a:fe:5c:65:c9:70:eb:52:62:a9:fc:72:18:38:09"]
+      - run:
+          name: "Install Dependencies"
+          command: |
+            apk add ansible gzip openssh-client
       - attach_workspace:
-          at: ~/    
+          at: ~/
       - run:
           name: Configure server
           command: |
+            ls
+            pwd
             cd .circleci/ansible
+            aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> inventory.txt
             cat inventory.txt
-            ansible-playbook -i inventory.txt configure-server.yml
+            ansible-playbook -i inventory.txt configure-server.yml -vv
       - destroy-environment       
          
 
