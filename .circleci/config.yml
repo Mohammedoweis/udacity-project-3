@@ -1,6 +1,6 @@
 version: 2.1
 commands:
-  install_awscli: 
+  install_awscli:
     description: Install Aws CLI v2
     steps:
       - run:
@@ -8,38 +8,38 @@ commands:
           command: |
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
-            sudo ./aws/install       
+            sudo ./aws/install
 
-    install_ansible: 
-      description: Install Ansible v2
-      steps:
-        - run:
-            name: Install Ansible v2
-            command: |
-                sudo apt update
-                sudo apt install software-properties-common
-                sudo add-apt-repository --yes --update ppa:ansible/ansible
-                sudo apt install ansible           
+  install_ansible:
+    description: Install Ansible v2
+    steps:
+      - run:
+          name: Install Ansible v2
+          command: |
+            sudo apt update
+            sudo apt install software-properties-common
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible
 
-    destroy-environment:
-      description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-      parameters:
-        Workflow_ID:
+  destroy-environment:
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+    parameters:
+      Workflow_ID:
         type: string
         default: ${CIRCLE_WORKFLOW_ID:0:7}
-      steps:
-        - run:
-            name: Destroy environment
-            when: on_fail
-            command: |
-              aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7}
-              aws s3 rm s3://udapeople-<<parameters.Workflow_ID>> --recursive
-              aws cloudformation delete-stack --stack-name frontend-<< parameters.Workflow_ID >>
+    steps:
+      - run:
+          name: Destroy environment
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7}
+            aws s3 rm s3://udapeople-<<parameters.Workflow_ID>> --recursive
+            aws cloudformation delete-stack --stack-name frontend-<< parameters.Workflow_ID >>
 
 #   revert-migrations:
 #     description: Revert the last migration if successfully run in the current workflow.
 #     parameters:
-#       # Add parameter here     
+#       # Add parameter here
 #     steps:
 #       - run:
 #           name: Revert migrations
@@ -47,14 +47,14 @@ commands:
 #           command: |
 #             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
 #             SUCCESS = 1
-#             if(( $SUCCESS==1 )); 
+#             if(( $SUCCESS==1 ));
 #             then
 #             #  cd ~/project/backend
 #             #  npm install
 #             #  Add revert code here. You can find this in the Getting Started section.
 #               exit 1
 #             fi
-            
+
 jobs:
   build-frontend:
     docker:
@@ -66,9 +66,9 @@ jobs:
       - run:
           name: Build front-end
           command: |
-           cd frontend
-           npm install
-           npm run build
+            cd frontend
+            npm install
+            npm run build
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-deps
@@ -83,9 +83,9 @@ jobs:
       - run:
           name: Back-end build
           command: |
-           cd backend
-           npm install
-           npm run build
+            cd backend
+            npm install
+            npm run build
       - save_cache:
           paths: [backend/node_modules]
           key: backend-deps
@@ -100,11 +100,10 @@ jobs:
       - run:
           name: Front-end Unit Test
           command: |
-           cd frontend
-           npm install
-           npm test
+            cd frontend
+            npm install
+            npm test
 
-                
   test-backend:
     docker:
       - image: cimg/node:13.8.0
@@ -115,13 +114,13 @@ jobs:
       - run:
           name: Back-end Unit Test
           command: |
-           cd backend
-           npm install
-           npm test
+            cd backend
+            npm install
+            npm test
 
       - save_cache:
           paths: [backend/node_modules]
-          key: backend-build      
+          key: backend-build
   scan-frontend:
     docker:
       - image: cimg/node:13.8.0
@@ -162,46 +161,46 @@ jobs:
               --tags project=udapeople \
               --stack-name "backend" \
               --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7}
-  
-             
+
       - run:
           name: Ensure front-end infrastructure exist
-          command: | 
+          command: |
             aws cloudformation deploy \
                --template-file .circleci/files/frontend.yml \
                --tags project=udapeople \
                --stack-name "frontend-${CIRCLE_WORKFLOW_ID:0:5}" \
-               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
-             
+               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+
       - run:
           name: Add back-end ip to ansible inventory
           command: |
             aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> .circleci/ansible/inventory.txt
-            cat .circleci/ansible/inventory.txt    
-           
+            cat .circleci/ansible/inventory.txt
+
       - persist_to_workspace:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-       
-      - destroy-environment 
 
-    configure-infrastructure:
-      steps:
+      - destroy-environment
+
+  configure-infrastructure:
+    docker:
+        - image: cimg/base:stable
+    steps:
       - checkout
       - install_ansible
       - add_ssh_keys:
           fingerprints: ["9b:1a:fe:5c:65:c9:70:eb:52:62:a9:fc:72:18:38:09"]
       - attach_workspace:
-          at: ~/    
+          at: ~/
       - run:
           name: Configure server
           command: |
             cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
-      - destroy-environment       
-         
+      - destroy-environment
 
 #   run-migrations:
 #     docker:
@@ -218,7 +217,7 @@ jobs:
 #           command: |
 #             # Your code here
 #             exit 1
-#      # Here's where you will add some code to rollback on failure      
+#      # Here's where you will add some code to rollback on failure
 
 #   deploy-frontend:
 #     docker:
@@ -239,8 +238,8 @@ jobs:
 #           name: Deploy frontend objects
 #           command: |
 #             # your code here
-#       # Here's where you will add some code to rollback on failure      
-                    
+#       # Here's where you will add some code to rollback on failure
+
 #   deploy-backend:
 #     docker:
 #       # Docker image here that supports Ansible
@@ -256,11 +255,11 @@ jobs:
 #           name: Deploy backend
 #           command: |
 #             # your code here
-#       # Here's where you will add some code to rollback on failure  
+#       # Here's where you will add some code to rollback on failure
 
 #   smoke-test:
 #     docker:
-#       # Lightweight Docker image 
+#       # Lightweight Docker image
 #     steps:
 #       # Checkout code from git
 #       - run:
@@ -279,7 +278,7 @@ jobs:
 #           name: Frontend smoke test.
 #           command: |
 #             # your code here
-#       # Here's where you will add some code to rollback on failure  
+#       # Here's where you will add some code to rollback on failure
 
 #   cloudfront-update:
 #     docker:
@@ -294,7 +293,7 @@ jobs:
 #           name: Update cloudfront distribution
 #           command: |
 #             # your code here
-#       # Here's where you will add some code to rollback on failure  
+#       # Here's where you will add some code to rollback on failure
 
 # cleanup:
 #     docker:
@@ -314,7 +313,6 @@ jobs:
 #             then
 #               # your code here
 #             fi
-            
 
 workflows:
   default:
