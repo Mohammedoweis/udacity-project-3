@@ -10,16 +10,16 @@ commands:
             unzip awscliv2.zip
             sudo ./aws/install       
 
-  install_ansible: 
-    description: Install Ansible v2
-    steps:
-      - run:
-          name: Install Ansible v2
-          command: |
-              sudo apt update
-              sudo apt install software-properties-common
-              sudo add-apt-repository --yes --update ppa:ansible/ansible
-              sudo apt install ansible           
+    install_ansible: 
+      description: Install Ansible v2
+      steps:
+        - run:
+            name: Install Ansible v2
+            command: |
+                sudo apt update
+                sudo apt install software-properties-common
+                sudo add-apt-repository --yes --update ppa:ansible/ansible
+                sudo apt install ansible           
 
     destroy-environment:
       description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -187,28 +187,19 @@ jobs:
       - destroy-environment 
 
     configure-infrastructure:
-      docker:
-        - image: cimg/base:stable
-      
       steps:
       - checkout
+      - install_ansible
       - add_ssh_keys:
           fingerprints: ["9b:1a:fe:5c:65:c9:70:eb:52:62:a9:fc:72:18:38:09"]
-      - run:
-          name: "Install Dependencies"
-          command: |
-            apk add ansible gzip openssh-client
       - attach_workspace:
-          at: ~/
+          at: ~/    
       - run:
           name: Configure server
           command: |
-            ls
-            pwd
             cd .circleci/ansible
-            aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> inventory.txt
             cat inventory.txt
-            ansible-playbook -i inventory.txt configure-server.yml -vv
+            ansible-playbook -i inventory.txt configure-server.yml
       - destroy-environment       
          
 
