@@ -10,16 +10,24 @@ commands:
             unzip awscliv2.zip
             sudo ./aws/install
 
-  install_ansible:
-    description: Install Ansible 
+  # install_ansible:
+  #   description: Install Ansible 
+  #   steps:
+  #     - run:
+  #         name: Install Ansible 
+  #         command: |
+  #           sudo apt update
+  #           sudo apt install software-properties-common
+  #           sudo add-apt-repository --yes --update ppa:ansible/ansible
+  #           sudo apt install ansible -y
+
+  install_ansible: #we will install ansible 
+    description: Install Ansible
     steps:
       - run:
-          name: Install Ansible 
+          name: Install Ansible
           command: |
-            sudo apt update
-            sudo apt install software-properties-common
-            sudo add-apt-repository --yes --update ppa:ansible/ansible
-            sudo apt install ansible -y
+            python3 -m pip install --user ansible          
 
   install_nodejs:  #we will install nodejs 13
     description: Install Node.js 13
@@ -280,13 +288,7 @@ jobs:
     steps:
       - checkout
       - run: sudo apt-get install tar gzip -y  
-      - run: 
-          name: install_ansible
-          command: |
-            sudo apt update
-            sudo apt install software-properties-common
-            sudo add-apt-repository --yes --update ppa:ansible/ansible
-            sudo apt install ansible -y
+      - install_ansible
       - install_nodejs
       - add_ssh_keys:
           fingerprints: ["9b:1a:fe:5c:65:c9:70:eb:52:62:a9:fc:72:18:38:09"]
