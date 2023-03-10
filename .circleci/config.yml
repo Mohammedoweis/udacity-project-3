@@ -279,7 +279,7 @@ jobs:
       - image: cimg/node:13.8.0
     steps:
       - checkout
-      - run: sudo apt-get install tar gzip -y  
+      # - run: sudo apt-get install tar gzip -y  
       - install_ansible
       - install_nodejs
       - add_ssh_keys:
