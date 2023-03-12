@@ -376,28 +376,28 @@ jobs:
       - revert-migrations  
 
   cleanup:
-      docker:
-        - image: cimg/base:stable
-      steps:
-        - checkout
-        - install_awscli
-        - install_nodejs 
-        - run:
-            name: Remove old stacks and files
-            command: |        
-              export STACKS=($(aws cloudformation list-stacks \
-                --query "StackSummaries[*].StackName" \
-                --stack-status-filter CREATE_COMPLETE --no-paginate --output text))   
-              echo Stack names: "${STACKS[@]}"
-              export OLDWORKFLOWID=$(curl --insecure https://kvdb.io/${KVDB_BUCKET}/old_workflow_id)
-              echo Old Workflow ID: $OLDWORKFLOWID               
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_awscli
+      - install_nodejs 
+      - run:
+          name: Remove old stacks and files
+          command: |        
+            export STACKS=($(aws cloudformation list-stacks \
+              --query "StackSummaries[*].StackName" \
+              --stack-status-filter CREATE_COMPLETE --no-paginate --output text))   
+            echo Stack names: "${STACKS[@]}"
+            export OLDWORKFLOWID=$(curl --insecure https://kvdb.io/${KVDB_BUCKET}/old_workflow_id)
+            echo Old Workflow ID: $OLDWORKFLOWID               
 
 
-              if [[ "${STACKS[@]}" =~ "${OLDWORKFLOWID}"" ]]
-              then
-                aws s3 rm "s3://udapeople-${OLDWORKFLOWID}" --recursive
-                aws cloudformation delete-stack --stack-name "backend-${OLDWORKFLOWID}"
-                aws cloudformation delete-stack --stack-name "frontend-${OLDWORKFLOWID}"
+            if [[ "${STACKS[@]}" =~ "${OLDWORKFLOWID}"" ]]
+            then
+              aws s3 rm "s3://udapeople-${OLDWORKFLOWID}" --recursive
+              aws cloudformation delete-stack --stack-name "backend-${OLDWORKFLOWID}"
+              aws cloudformation delete-stack --stack-name "frontend-${OLDWORKFLOWID}"
               fi
 
 
