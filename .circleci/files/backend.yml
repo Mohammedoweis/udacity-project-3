@@ -42,9 +42,9 @@ Resources:
       KeyName: udacity3 
       ImageId: ami-068663a3c619dd892 
       Tags:
-        - Key: udacity3
+        - Key: Name
           Value: !Sub backend-${ID}
-        - key: project
+        - Key: project
           value: Udapeople  
 
           
