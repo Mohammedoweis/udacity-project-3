@@ -44,6 +44,8 @@ Resources:
       Tags:
         - Key: udacity3
           Value: !Sub backend-${ID}
+        - key: project
+          value: Udapeople  
 
           
 
